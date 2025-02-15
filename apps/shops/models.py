@@ -34,7 +34,7 @@ class Medicine(Model):
 
 class Cart(Model):
     user = ForeignKey('users.User', CASCADE)  # Foydalanuvchi
-    medicine = ForeignKey('medical.Medicine', CASCADE)  # Dori
+    medicine = ForeignKey('shops.Medicine', CASCADE)  # Dori
     quantity = PositiveIntegerField(default=1)  # Miqdor
     added_at = DateTimeField(auto_now_add=True)  # Qo‘shilgan vaqt
 

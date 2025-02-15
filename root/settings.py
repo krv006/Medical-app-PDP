@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # My Apps
     'users',
     'medical',
+    'shops',
 
     # Third Party packages
     'rest_framework',

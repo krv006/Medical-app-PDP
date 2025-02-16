@@ -8,12 +8,10 @@ from users.managers import CustomUserManager
 
 class User(AbstractUser):
     username = None
-    first_name = None
-    last_name = None
+    full_name = None
     email = EmailField(unique=True)
-    name = CharField(max_length=255)
     is_active = BooleanField(default=False)
-
+    # todo is_active true qib qoyish kerak avtamatik tasdiqlaganda
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()

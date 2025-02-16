@@ -1,3 +1,11 @@
-login register email
+users:
+    login register email
+    todo is_active true qib qoyish kerak avtamatik tasdiqlaganda
 
+medical:
+    search filter
+
+
+shop:
+    app
 

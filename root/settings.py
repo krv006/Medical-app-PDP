@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'users',
     'medical',
     'shops',
+    'base',
 
     # Third Party packages
     'rest_framework',
@@ -66,14 +67,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'root.wsgi.application'
 AUTH_USER_MODEL = 'users.User'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv('DB_NAME'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'USER': os.getenv('DB_USER'),
+#         'PORT': os.getenv('db_port'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DB_NAME'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'USER': os.getenv('DB_USER'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

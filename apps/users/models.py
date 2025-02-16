@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser
 from django.db.models import EmailField, BooleanField
-from django.db.models import Model, CharField
+from django.db.models import Model
 
 from users.managers import CustomUserManager
 

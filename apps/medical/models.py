@@ -1,8 +1,6 @@
-from functools import cached_property
-
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models import Model, ImageField, ForeignKey, CASCADE, SET_NULL, TextChoices
-from django.db.models.fields import CharField, DateTimeField, TextField, FloatField, PositiveSmallIntegerField
+from django.db.models import Model, ImageField, ForeignKey, CASCADE, SET_NULL
+from django.db.models.fields import CharField, TextField, PositiveSmallIntegerField
 
 from base.model import TimeBasedModel, Payment
 

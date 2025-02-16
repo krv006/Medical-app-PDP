@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models import Model, OneToOneField, CASCADE, ForeignKey, ImageField, TextChoices
+from django.db.models import Model, CASCADE, ForeignKey, ImageField
 from django.db.models.fields import CharField, FloatField, DateTimeField, DecimalField, PositiveIntegerField, TextField, \
     PositiveSmallIntegerField, BooleanField
 

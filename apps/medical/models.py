@@ -35,7 +35,7 @@ class Doctor(TimeBasedModel):
         return self.stars / 2
 
 
-class BookApointment(Payment):
+class BookAppointment(Payment):
     amount = PositiveSmallIntegerField(db_default=60)  # 60$ per hours
     admin_fee = PositiveSmallIntegerField(db_default=1)
     doctor = ForeignKey('medical.Doctor', CASCADE, related_name='book_appointments')

@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Model, OneToOneField, CASCADE, ForeignKey, ImageField
 from django.db.models.fields import CharField, FloatField, DateTimeField, DecimalField, PositiveIntegerField, TextField
@@ -42,7 +41,7 @@ class Cart(Model):
         return self.medicine.price * self.quantity
 
     def __str__(self):
-        return f"{self.user.username} - {self.medicine.name}"
+        return f"{self.user.email} - {self.medicine.name}"
 
 
 class Order(Model):
@@ -59,7 +58,7 @@ class Order(Model):
     payment_method = CharField(max_length=50, default="Visa")  # To‘lov turi
 
     def __str__(self):
-        return f"Order {self.id} - {self.user.username} - {self.status}"
+        return f"Order {self.id} - {self.user.email} - {self.status}"
 
 
 class Location(Model):
@@ -69,4 +68,4 @@ class Location(Model):
     longitude = FloatField()  # Uzunlik
 
     def __str__(self):
-        return f"{self.user.username} - {self.address}"
+        return f"{self.user.email} - {self.address}"

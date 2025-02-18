@@ -9,11 +9,14 @@ class TimeBasedModel(Model):
         abstract = True
 
 
-class Payment(TimeBasedModel):
+class Payment(Model):
     class PaymentMethod(TextChoices):
         VISA = 'visa', 'VISA'
         PAYME = 'payme', 'Payme'
         CLICK = 'click', 'Click'
         CASH = 'cash', 'Cash'
 
-    payment_method = CharField(max_length=120, choices=PaymentMethod.choices, db_default=PaymentMethod.CASH)
+    payment_method = CharField(max_length=120, choices=PaymentMethod.choices, default=PaymentMethod.CASH)
+
+    class Meta:
+        abstract = True

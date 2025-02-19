@@ -43,10 +43,10 @@ class Product(Model):
 class Order(Payment):
     quantity = PositiveIntegerField(default=1)  # Miqdor
     added_at = DateTimeField(auto_now_add=True)  # Qo‘shilgan vaqt
-    taxes = PositiveSmallIntegerField(db_default=1)
-    location = ForeignKey('shops.Location', CASCADE, related_name='orders')
-    product = ForeignKey('shops.Product', CASCADE, related_name='orders')  # Dori
-    user = ForeignKey('users.User', CASCADE, related_name='orders')  # Foydalanuvchi
+    taxes = PositiveSmallIntegerField(default=1)  # Changed from db_default to default
+    location = ForeignKey('shops.Location', on_delete=CASCADE, related_name='orders')
+    product = ForeignKey('shops.Product', on_delete=CASCADE, related_name='orders')  # Dori
+    user = ForeignKey('users.User', on_delete=CASCADE, related_name='orders')  # Foydalanuvchi
 
     def total_price(self):
         return self.product.price * self.quantity + self.taxes

@@ -1,8 +1,19 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models import Model, ImageField, ForeignKey, CASCADE, SET_NULL
-from django.db.models.fields import CharField, TextField, PositiveSmallIntegerField
+from django.db.models import Model, ImageField, ForeignKey, CASCADE, ManyToManyField
+from django.db.models.fields import CharField, TextField, PositiveSmallIntegerField, TimeField, FloatField
 
 from base.model import TimeBasedModel, Payment
+
+
+class MainCategory(TimeBasedModel):
+    name = CharField(max_length=50)
+    icon = ImageField(upload_to="main-category/icons/%Y/%m/%d")
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        ordering = 'id',
 
 
 class Category(TimeBasedModel):
@@ -12,6 +23,9 @@ class Category(TimeBasedModel):
     def __str__(self):
         return f"{self.name}"
 
+    class Meta:
+        ordering = "id",
+
 
 class Doctor(TimeBasedModel):
     full_name = CharField(max_length=255)
@@ -19,11 +33,11 @@ class Doctor(TimeBasedModel):
     distance = CharField(max_length=50, blank=True, null=True)  # Masofa (masalan, 800m away)
     about = TextField(null=True, blank=True)
     image = ImageField(upload_to="doctors/", blank=True, null=True)  # Profil rasmi
-    arrival_time = CharField(max_length=255, help_text='ish vaqtingizni kiriting kelish vaqti')  # Ish kelish
-    leave_time = CharField(max_length=255, help_text='ish vaqtingizni kiriting ketish vaqti')  # Ish ketish
-    stars = PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], null=True, blank=True)
+    arrival_time = TimeField(help_text='ish vaqtingizni kiriting kelish vaqti')  # Ish kelish
+    leave_time = TimeField(help_text='ish vaqtingizni kiriting ketish vaqti')  # Ish ketish
+    stars = FloatField(validators=[MinValueValidator(1), MaxValueValidator(10)], null=True, blank=True)
     category = ForeignKey('medical.Category', CASCADE, related_name='doctors')
-    user = ForeignKey('users.User', SET_NULL, related_name='doctors', null=True, blank=True)
+    # clients = ManyToManyField('users.User', related_name='doctors_clients')
 
     def __str__(self):
         return f"Dr. {self.full_name} - {self.specialty}"
@@ -31,6 +45,9 @@ class Doctor(TimeBasedModel):
     @property
     def star(self):
         return self.stars / 2
+
+    class Meta:
+        ordering = 'id',
 
 
 class BookAppointment(Payment):

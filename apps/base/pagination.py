@@ -6,7 +6,7 @@ class CustomPageNumberPagination(PageNumberPagination):
     page_query_param = 'sahifa'
     page_size_query_description = "Har bit sahifada nechtadan bo'lishi mumkin"
     max_page_size = 100
-    page_size = 1
+    page_size = 2
 
 
 class CustomCursorPagination(CursorPagination):

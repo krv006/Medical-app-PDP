@@ -9,7 +9,7 @@ from users.serializers import LoginSerializer, RegisterModelSerializer, VerifyCo
     RessetVerifyCodeSerializer, ResetPasswordSerializer, ConfirmPasswordSerializer
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for login users that already exists in database
 """)
 class LoginAPIView(GenericAPIView):
@@ -29,7 +29,7 @@ class LoginAPIView(GenericAPIView):
         )
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for users registrations
 """)
 class RegisterAPIView(CreateAPIView):
@@ -47,7 +47,7 @@ class RegisterAPIView(CreateAPIView):
         return Response({f"Verification code sent to you email: {email}"})
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for verify code
 """)
 class VerifyCodeApiView(GenericAPIView):
@@ -59,7 +59,7 @@ class VerifyCodeApiView(GenericAPIView):
         return Response({"Successfully verified code!"}, status=HTTP_200_OK)
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for reset verification code
 """)
 class ResetVerificationCodeAPIView(GenericAPIView):
@@ -71,7 +71,7 @@ class ResetVerificationCodeAPIView(GenericAPIView):
         return Response({"Successfully resend verification code!"}, status=HTTP_200_OK)
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for reset user password
 """)
 class ResetPasswordAPIView(GenericAPIView):
@@ -87,7 +87,7 @@ class ResetPasswordAPIView(GenericAPIView):
         return Response({"message": f"Sent via SMS verification code to your phone: {phone}"})
 
 
-@extend_schema(tags=['auth'], description="""
+@extend_schema(tags=['Auth'], description="""
 API for user confirm new password
 """)
 class ConfirmNewPasswordAPIView(GenericAPIView):

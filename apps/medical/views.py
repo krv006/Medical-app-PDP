@@ -1,19 +1,21 @@
+import datetime
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from base.custom_searchfilter import CustomSearchFilter
 from base.pagination import CustomPageNumberPagination
-from medical.filters import TopDoctorFilterSet
+from medical.filters import TopDoctorFilterSet, DoctorFilterSet
 from medical.models import MainCategory, Category, Doctor, BookAppointment
 from medical.serializers import MainCategoriesModelSerializer, CategoryModelSerializer, DoctorsModelSerializer, \
-    RecentDoctorsModelSerializer, DoctorDetailModelSerializer
+    RecentDoctorsModelSerializer, DoctorDetailModelSerializer, CreateAppointmentModelSerializer
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for get list or detail of main categories
 """)
 class MainCategoriesListAPIView(ListAPIView):
@@ -23,7 +25,7 @@ class MainCategoriesListAPIView(ListAPIView):
     search_fields = "name",
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for get list or detail of doctors categories
 """)
 class DoctorCategoryListAPIView(ListAPIView):
@@ -31,7 +33,7 @@ class DoctorCategoryListAPIView(ListAPIView):
     serializer_class = CategoryModelSerializer
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for get list of doctors
 """)
 class DoctorsListAPIView(ListAPIView):
@@ -40,9 +42,10 @@ class DoctorsListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     filter_backends = CustomSearchFilter, DjangoFilterBackend
     search_fields = 'full_name', 'specialty', 'distance', 'arrival_time', 'stars'
+    filterset_class = DoctorFilterSet
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for get list of top doctors
 """)
 class TopDoctorsListAPIView(ListAPIView):
@@ -53,7 +56,7 @@ class TopDoctorsListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for get list of client recent doctors
 """)
 class ClientRecentDoctors(ListAPIView):
@@ -74,10 +77,33 @@ class ClientRecentDoctors(ListAPIView):
         return Response(serializer.data)
 
 
-@extend_schema(tags=['home-page'], description="""
+@extend_schema(tags=['Home-page'], description="""
 API for doctor detail
 """)
 class DoctoDetailAPIView(RetrieveAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorDetailModelSerializer
+    permission_classes = IsAuthenticated,
+
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        doctor = self.get_object()
+        doctors_todays_appointments = BookAppointment.objects.filter(
+            doctor=doctor,
+            created_at__date=datetime.datetime.now().date()
+        ).values_list('appointment_date', flat=True)
+        arrive_time = doctor.arrival_time.hour
+        leave_time = doctor.leave_time.hour
+        lunch_time = [doctor.lunch_time.hour, doctor.lunch_time.hour + 1]
+        busy_hours = [d.hour for d in doctors_todays_appointments] + lunch_time
+        ctx['empty_hours'] = [time for time in range(arrive_time, leave_time + 1) if time not in busy_hours]
+        return ctx
+
+
+@extend_schema(tags=['Home-page'], description="""
+API for booking doctor
+""")
+class CreateAppointmentAPIView(CreateAPIView):
+    queryset = BookAppointment.objects.all()
+    serializer_class = CreateAppointmentModelSerializer
     permission_classes = IsAuthenticated,

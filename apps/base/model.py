@@ -9,7 +9,7 @@ class TimeBasedModel(Model):
         abstract = True
 
 
-class Payment(Model):
+class Payment(TimeBasedModel):
     class PaymentMethod(TextChoices):
         VISA = 'visa', 'VISA'
         PAYME = 'payme', 'Payme'

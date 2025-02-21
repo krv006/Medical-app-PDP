@@ -66,22 +66,18 @@ class Product(Model):
 
 
 class Order(Payment):
-    quantity = PositiveIntegerField(default=1)
-    added_at = DateTimeField(auto_now_add=True)
     taxes = PositiveSmallIntegerField(default=1)
     location = ForeignKey('shops.Location', on_delete=CASCADE, related_name='orders')
-    product = ForeignKey('shops.Product', on_delete=CASCADE, related_name='orders')
     user = ForeignKey('users.User', on_delete=CASCADE, related_name='orders')
 
+    @property
     def total_price(self):
-        return self.product.price * self.quantity + self.taxes
-
-    def __str__(self):
-        return f"{self.user.email} - {self.product.name} and {self.taxes}$"
+        total = sum(item.sub_amount for item in self.order_items.all())
+        return total
 
 
 class OrderItem(Model):
-    order = ForeignKey(Order, CASCADE, related_name='order_items')
+    order = ForeignKey(Order, CASCADE, related_name='order_items', null=True)
     product = ForeignKey('shops.Product', CASCADE,
                          related_name='order_items')
     user = ForeignKey('users.User', CASCADE, related_name='order_items')
@@ -89,6 +85,17 @@ class OrderItem(Model):
 
     def __str__(self):
         return f"OrderItem {self.id} - {self.product.name} | User: {self.user.email}"
+
+    @property
+    def sub_amount(self):
+        return self.quantity * self.product.price
+
+
+class Cart(TimeBasedModel):
+    taxes = PositiveSmallIntegerField(default=1)
+    user = ForeignKey('users.User', CASCADE, related_name='user_cart')
+    product = ForeignKey('shops.Product', CASCADE)
+    quantity = PositiveSmallIntegerField(db_default=1)
 
     @property
     def sub_amount(self):

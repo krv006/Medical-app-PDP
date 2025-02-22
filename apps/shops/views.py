@@ -1,14 +1,18 @@
+from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, GenericAPIView, CreateAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from base.pagination import CustomPageNumberPagination
 from medical.filters import ProductFilterSet
-from shops.models import Article, Product
+from medical.models import Payment
+from shops.models import Article, Product, Cart, Order, OrderItem
 from shops.serializers import ArticleModelSerializer, ArticleDetailModelSerializer, TopProductModelSerializer, \
-    ProductDetailModelSerializer
+    ProductDetailModelSerializer, AddToCartModelSerializer, PaymentMethodsModelSerializer, CreateOrderModelSerializer
 
 
 @extend_schema(tags=['Online Pharmacy'], description="""
@@ -71,3 +75,73 @@ class ProductDetailAPIView(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductDetailModelSerializer
 
+
+@extend_schema(tags=['Online Pharmacy'], description="""
+API for add product to cart and get list
+""")
+class AddProductToCartAPIView(ListCreateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = AddToCartModelSerializer
+    permission_classes = IsAuthenticated,
+
+    def get(self, request, *args, **kwargs):
+        qs = self.get_queryset().filter(user=self.request.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        ctx['sub_total'] = sum(c.sub_amount for c in Cart.objects.filter(user=self.request.user))
+        return ctx
+
+
+@extend_schema(tags=['Online Pharmacy'], description="""
+API for create order
+""")
+class CreateOrderAPIView(CreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = CreateOrderModelSerializer
+    permission_classes = IsAuthenticated,
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data = self.request.data
+        location = int(data.pop('location'))
+        order = Order(location_id=location, user=user, taxes=int(data.get('taxes')))
+        order.save()
+        order_items = OrderItem.objects.filter(user=user, order_id=None)
+        if not order_items:
+            raise ValidationError('No order items')
+        order_items.update(order=order)
+        return Response(self.get_serializer(order, many=True))
+
+
+@extend_schema(tags=['Online Pharmacy'], description="""
+API for create order-item
+""")
+class CreateOrderItemAPIView(GenericAPIView):
+    queryset = OrderItem.objects.all()
+    permission_classes = IsAuthenticated,
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        user_cart = Cart.objects.filter(user=user)
+        if user_cart:
+            for i in user_cart:
+                OrderItem.objects.create(
+                    user=user,
+                    product=i.product,
+                    quantity=i.quantity
+                )
+            else:
+                user_cart.delete()
+                return Response({"message": "Successfully created order-items"}, HTTP_204_NO_CONTENT)
+
+
+@extend_schema(tags=['Online Pharmacy'], description="""
+API for get payment methods
+""")
+class PaymentMethodsListAPIView(ListAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentMethodsModelSerializer
+    permission_classes = IsAuthenticated,

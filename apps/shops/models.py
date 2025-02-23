@@ -67,13 +67,18 @@ class Product(Model):
 
 class Order(Payment):
     taxes = PositiveSmallIntegerField(default=1)
-    location = ForeignKey('shops.Location', on_delete=CASCADE, related_name='orders')
+    latitude = FloatField()
+    longitude = FloatField()
     user = ForeignKey('users.User', on_delete=CASCADE, related_name='orders')
 
     @property
     def total_price(self):
         total = sum(item.sub_amount for item in self.order_items.all())
         return total
+
+    @property
+    def location(self):
+        return [self.latitude, self.longitude]
 
 
 class OrderItem(Model):

@@ -1,8 +1,9 @@
 from rest_framework.fields import HiddenField, CurrentUserDefault, SerializerMethodField
+from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from medical.models import Payment
-from shops.models import Article, Product, Cart, Order, OrderItem
+from shops.models import Article, Product, Cart, Order, Location
 
 
 class ArticleModelSerializer(ModelSerializer):
@@ -44,6 +45,7 @@ class AddToCartModelSerializer(ModelSerializer):
     def get_total(self, obj: Cart):
         return obj.taxes + int(self.context.get('sub_total', []))
 
+
 # class CreateOrderItemModelSerializer(ModelSerializer):
 #     user = HiddenField(default=CurrentUserDefault())
 #
@@ -57,7 +59,6 @@ class CreateOrderModelSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
-
 
 
 class PaymentMethodsModelSerializer(ModelSerializer):

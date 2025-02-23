@@ -1,11 +1,10 @@
-from django.core.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, GenericAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 from base.pagination import CustomPageNumberPagination
 from medical.filters import ProductFilterSet
@@ -106,14 +105,17 @@ class CreateOrderAPIView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
         data = self.request.data
-        location = int(data.pop('location'))
-        order = Order(location_id=location, user=user, taxes=int(data.get('taxes')))
+        order = Order(latitude=data.get('latitude'),
+                      longitude=data.get('longitude'),
+                      user=user,
+                      taxes=data.get('taxes'),
+                      payment_method=data.get('payment_method'))
         order.save()
         order_items = OrderItem.objects.filter(user=user, order_id=None)
         if not order_items:
-            raise ValidationError('No order items')
+            return Response('No order items', status=HTTP_400_BAD_REQUEST)
         order_items.update(order=order)
-        return Response(self.get_serializer(order, many=True))
+        return Response("Successfully created order")
 
 
 @extend_schema(tags=['Online Pharmacy'], description="""

@@ -16,7 +16,7 @@ class Article(Model):
 
     title = CharField(max_length=255)
     content = TextField()
-    category = CharField(choices=ArticleCategory.choices)
+    category = CharField(max_length=255, choices=ArticleCategory.choices)
     image = ImageField(upload_to="articles/", blank=True, null=True)
     published_date = DateTimeField(auto_now_add=True)
     amount_of_views = PositiveIntegerField(help_text="Ko'rishlar soni", default=0, editable=False)
@@ -46,7 +46,7 @@ class Product(Model):
     price = DecimalField(max_digits=10, decimal_places=2)
     quantity = PositiveIntegerField(default=1)
     image = ImageField(upload_to="medicines/", blank=True, null=True)
-    medicine_type = CharField(choices=MedicineType.choices)
+    medicine_type = CharField(max_length=255, choices=MedicineType.choices)
     stars = PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], null=True, blank=True,
                                       editable=False)
     wight = CharField(max_length=50, blank=True, null=True, help_text='Masalan 75ml')
